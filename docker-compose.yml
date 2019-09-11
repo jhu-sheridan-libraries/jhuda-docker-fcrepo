@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+
+  fcrepo:
+    build:
+      context: ./fcrepo
+    image: data-arx/fcrepo:latest
+    container_name: fcrepo
+    ports:
+      - "${JETTY_PORT}:${JETTY_PORT}"
+    volumes:
+      - /Users/esm/iCloud/data-arx/volumes/data:/data

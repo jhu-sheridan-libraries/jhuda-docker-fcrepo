@@ -5,6 +5,7 @@
 FCREPO_USER=fedoraAdmin
 FCREPO_PASS=moo
 FCREPO_BASE_URI=http://localhost:8080/fcrepo/rest
+BUNDLES_RELATIVE_URI=bundles
 
 function is_empty() {
   local DIR=$1
@@ -40,7 +41,7 @@ then
     exit 0;
   fi
 
-  create_container ingests
+  create_container ${BUNDLES_RELATIVE_URI}
   sleep 2
   apk -q del curl
   killall java
