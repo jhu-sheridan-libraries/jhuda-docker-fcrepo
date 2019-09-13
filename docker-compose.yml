@@ -5,9 +5,24 @@ services:
   fcrepo:
     build:
       context: ./fcrepo
-    image: data-arx/fcrepo:latest
+    image: slarx/fcrepo:latest
     container_name: fcrepo
     ports:
       - "${JETTY_PORT}:${JETTY_PORT}"
     volumes:
-      - /Users/esm/iCloud/data-arx/volumes/data:/data
+      - slarxdata:/data
+    depends_on:
+      - assets
+
+  assets:
+    build:
+      context: ./assets
+    image: slarx/assets:latest
+    container_name: assets
+    volumes:
+      - slarxdata:/data
+
+volumes:
+
+  slarxdata:
+    driver: local

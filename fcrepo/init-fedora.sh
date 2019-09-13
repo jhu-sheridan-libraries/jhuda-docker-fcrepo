@@ -5,6 +5,7 @@
 FCREPO_USER=fedoraAdmin
 FCREPO_PASS=moo
 FCREPO_BASE_URI=http://localhost:8080/fcrepo/rest
+FCREPO_DATA_DIR=/data/fcrepo
 BUNDLES_RELATIVE_URI=bundles
 
 function is_empty() {
@@ -18,7 +19,12 @@ function create_container() {
   curl -u ${FCREPO_USER}:${FCREPO_PASS} -X PUT -H "Content-Type: text/turtle" -s -o /dev/null ${FCREPO_BASE_URI}/${RESOURCE}
 }
 
-is_empty /data
+if [ ! -d ${FCREPO_DATA_DIR} ] ;
+then
+  mkdir ${FCREPO_DATA_DIR}
+fi
+
+is_empty ${FCREPO_DATA_DIR}
 
 if [ $? -eq 0 ] ;
 then
@@ -48,6 +54,3 @@ then
 fi
 
 java -jar start.jar -Djetty.http.port=${JETTY_PORT}
-
-
-
