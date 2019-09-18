@@ -30,6 +30,8 @@ ADD fcrepo.ini start.d/
 
 COPY init-fedora.sh /
 
+COPY namespaces.yml webapps/fcrepo/WEB-INF/classes/
+
 VOLUME /data
 
 EXPOSE ${JETTY_PORT}
