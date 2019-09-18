@@ -19,6 +19,8 @@ function create_container() {
   curl -u ${FCREPO_USER}:${FCREPO_PASS} -X PUT -H "Content-Type: text/turtle" -s -o /dev/null ${FCREPO_BASE_URI}/${RESOURCE}
 }
 
+env | sort -u
+
 if [ ! -d ${FCREPO_DATA_DIR} ] ;
 then
   mkdir ${FCREPO_DATA_DIR}
