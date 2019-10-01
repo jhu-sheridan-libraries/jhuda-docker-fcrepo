@@ -32,6 +32,8 @@ COPY init-fedora.sh /
 
 COPY namespaces.yml webapps/fcrepo/WEB-INF/classes/
 
+COPY web.xml webapps/fcrepo/WEB-INF/
+
 VOLUME /data
 
 EXPOSE ${JETTY_PORT}
