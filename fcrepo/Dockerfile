@@ -42,6 +42,8 @@ COPY fedora-env.sh /
 
 COPY init-fedora.sh /
 
+COPY run_tests.sh /
+
 COPY web.xml webapps/fcrepo/WEB-INF/
 
 VOLUME /data
