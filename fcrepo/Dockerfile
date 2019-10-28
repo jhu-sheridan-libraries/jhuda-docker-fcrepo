@@ -38,6 +38,8 @@ ADD fcrepo-realm.xml fcrepo-realm.properties etc/
 
 ADD fcrepo.ini start.d/
 
+COPY fedora-env.sh /
+
 COPY init-fedora.sh /
 
 COPY web.xml webapps/fcrepo/WEB-INF/
