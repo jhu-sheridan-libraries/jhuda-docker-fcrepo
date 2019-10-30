@@ -2,21 +2,14 @@ version: '3.1'
 
 services:
 
-  fcrepo:
+  sut:
     build:
-      context: ./fcrepo
-    image: slarx/fcrepo:latest
-    container_name: fcrepo
-    ports:
-      - "${JETTY_PORT}:${JETTY_PORT}"
-    volumes:
-      - slarxdata:/data
+      context: .
+    command: /run_tests.sh
     depends_on:
       - assets
 
   assets:
-    build:
-      context: ./assets
     image: slarx/assets:latest
     container_name: assets
     volumes:
@@ -26,4 +19,3 @@ volumes:
 
   slarxdata:
     driver: local
-

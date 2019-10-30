@@ -1,5 +1,5 @@
 #!/bin/ash
-
+#set -vx
 FCREPO_USER=fedoraAdmin
 FCREPO_PASS=moo
 FCREPO_BASE_URI=http://localhost:8080/fcrepo/rest
@@ -19,7 +19,8 @@ function create_container() {
 function fedora_up() {
   HTTP_STATUS_CODE=0
   COUNT=0
-  while [ ${HTTP_STATUS_CODE} -ne 200 ] && [ ${COUNT} -lt 10 ] ;
+  MAX_TRIES=$1
+  while [ ${HTTP_STATUS_CODE} -ne 200 ] && [ ${COUNT} -lt ${MAX_TRIES} ] ;
   do
     HTTP_STATUS_CODE=`curl -u ${FCREPO_USER}:${FCREPO_PASS} -s -o /dev/null -w %{http_code} ${FCREPO_BASE_URI}`
     let COUNT=${COUNT}+1

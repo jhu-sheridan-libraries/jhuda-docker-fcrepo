@@ -2,7 +2,7 @@
 
 #set -vx
 
-source fedora-env.sh
+source /fedora-env.sh
 
 env | sort -u
 
@@ -19,7 +19,7 @@ then
   apk -q --no-progress add curl
   java -jar start.jar -Djetty.http.port=8080 2>/dev/null 1>/dev/null &
 
-  fedora_up()
+  fedora_up 30
 
   if [ $? -ne 0 ] ;
   then
@@ -30,6 +30,8 @@ then
   sleep 2
   apk -q del curl
   killall java
+  echo "Initialization complete..."
 fi
 
+echo "Starting Fedora..."
 java -jar start.jar -Djetty.http.port=${JETTY_PORT}

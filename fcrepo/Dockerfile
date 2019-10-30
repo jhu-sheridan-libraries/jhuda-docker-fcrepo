@@ -51,3 +51,4 @@ VOLUME /data
 EXPOSE ${JETTY_PORT}
 
 CMD [ "/init-fedora.sh" ]
+

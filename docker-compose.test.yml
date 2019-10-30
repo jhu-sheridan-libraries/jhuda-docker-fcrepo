@@ -1,9 +1,0 @@
-version: '3.1'
-
-services:
-
-  sut:
-    build: .
-    command: run_tests.sh
-    depends_on:
-      - assets
