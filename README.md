@@ -1,4 +1,6 @@
-# Fedora 5 Image
+# Fedora Image
+
+Provides the Fedora repository image used by the JHU Data Archive.  Notably the image adds servlet filters enhancing Fedora's capablity with respect to interacting with JSON-LD.
 
 ## Status
 ![Automated Build](https://img.shields.io/docker/cloud/automated/jhuda/fcrepo) ![Build Status](https://img.shields.io/docker/cloud/build/jhuda/fcrepo)
