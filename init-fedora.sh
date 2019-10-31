@@ -4,6 +4,7 @@
 
 source /fedora-env.sh
 
+echo "fcrepo container environment:"
 env | sort -u
 
 if [ ! -d ${FCREPO_DATA_DIR} ] ;
@@ -17,7 +18,7 @@ if [ $? -eq 0 ] ;
 then
   echo "Initializing Fedora..."
   apk -q --no-progress add curl
-  java -jar start.jar -Djetty.http.port=8080 2>/dev/null 1>/dev/null &
+  java -jar start.jar -Djetty.http.port=${JETTY_PORT} 2>/dev/null 1>/dev/null &
 
   fedora_up 30
 

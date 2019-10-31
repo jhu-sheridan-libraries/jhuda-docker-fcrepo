@@ -4,26 +4,24 @@ services:
 
   fcrepo:
     build:
-      context: ./fcrepo
-    image: slarx/fcrepo:latest
+      context: .
+    image: jhuda/fcrepo:latest
     container_name: fcrepo
+    env_file: .env
     ports:
       - "${JETTY_PORT}:${JETTY_PORT}"
     volumes:
-      - slarxdata:/data
+      - jhuda-assets:/data
     depends_on:
       - assets
 
   assets:
-    build:
-      context: ./assets
-    image: slarx/assets:latest
+    image: jhuda/assets:latest
     container_name: assets
     volumes:
-      - slarxdata:/data
+      - jhuda-assets:/data
 
 volumes:
 
-  slarxdata:
+  jhuda-assets:
     driver: local
-

@@ -6,16 +6,18 @@ services:
     build:
       context: .
     command: /run_tests.sh
+    env_file: .env
     depends_on:
       - assets
+    volumes:
+      - jhuda-assets:/data
 
   assets:
-    image: slarx/assets:latest
-    container_name: assets
+    image: jhuda/assets:latest
     volumes:
-      - slarxdata:/data
+      - jhuda-assets:/data
 
 volumes:
 
-  slarxdata:
+  jhuda-assets:
     driver: local

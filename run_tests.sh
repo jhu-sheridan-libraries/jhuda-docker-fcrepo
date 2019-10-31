@@ -15,11 +15,10 @@ cat /tmp/run_tests.err
 echo "** run_tests.out **"
 cat /tmp/run_tests.out
 
-if [ $? -ne 0 ] ;
-then
-    echo "Tests completed with error."
-    echo "Exiting."
-    exit 1;
-fi
+test_and_exit $? "Jetty failed to start (see above log output)"
+
+ls -l /data/README.md
+
+test_and_exit $? "Missing expected file /data/README.md from assets image."
 
 echo "Tests completed successfully."

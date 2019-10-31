@@ -1,9 +1,5 @@
 #!/bin/ash
 #set -vx
-FCREPO_USER=fedoraAdmin
-FCREPO_PASS=moo
-FCREPO_BASE_URI=http://localhost:8080/fcrepo/rest
-FCREPO_DATA_DIR=/data/fcrepo
 
 function is_empty() {
   local DIR=$1
@@ -34,4 +30,19 @@ function fedora_up() {
   fi
 
   return 0;
+}
+
+function test_and_exit() {
+  local REASON=${2}
+  if [ $1 -ne 0 ] ;
+  then
+    if [[ -z "${REASON}" ]] ;
+    then
+      echo "Tests completed with error."
+    else
+      echo ${REASON}
+    fi
+    echo "Exiting."
+    exit 1;
+  fi
 }
