@@ -5,6 +5,6 @@
 
 ## Locations
 * [Docker Hub](https://hub.docker.com/r/jhuda/fcrepo/tags) 
-* [Dockerfile](fcrepo/Dockerfile)
+* [Dockerfile](Dockerfile)
 * [Build History](https://hub.docker.com/r/jhuda/fcrepo/builds)
 
