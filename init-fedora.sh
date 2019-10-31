@@ -18,7 +18,7 @@ if [ $? -eq 0 ] ;
 then
   echo "Initializing Fedora..."
   apk -q --no-progress add curl
-  java -jar start.jar -Djetty.http.port=${JETTY_PORT} 2>/dev/null 1>/dev/null &
+  java -jar start.jar -Djetty.http.port=${FCREPO_JETTY_PORT} 2>/dev/null 1>/dev/null &
 
   fedora_up 30
 
@@ -35,4 +35,4 @@ then
 fi
 
 echo "Starting Fedora..."
-java -jar start.jar -Djetty.http.port=${JETTY_PORT}
+java -jar start.jar -Djetty.http.port=${FCREPO_JETTY_PORT}
