@@ -2,7 +2,7 @@ FROM alpine:3.10.2
 
 ENV JETTY_VER=9.4.20.v20190813
 ENV JETTY_BIN=https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/${JETTY_VER}/jetty-distribution-${JETTY_VER}.tar.gz
-ENV JETTY_PORT=8080
+ENV FCREPO_JETTY_PORT=8080
 ENV FEDORA_VER=5.1.0
 ENV FEDORA_BIN=https://github.com/fcrepo4/fcrepo4/releases/download/fcrepo-${FEDORA_VER}/fcrepo-webapp-${FEDORA_VER}.war
 ENV JSONLD_ADDON_VERSION=0.0.6 \
@@ -48,7 +48,7 @@ COPY web.xml webapps/fcrepo/WEB-INF/
 
 VOLUME /data
 
-EXPOSE ${JETTY_PORT}
+EXPOSE ${FCREPO_JETTY_PORT}
 
 CMD [ "/init-fedora.sh" ]
 

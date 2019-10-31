@@ -9,7 +9,7 @@ services:
     container_name: fcrepo
     env_file: .env
     ports:
-      - "${JETTY_PORT}:${JETTY_PORT}"
+      - "${FCREPO_JETTY_PORT}:${FCREPO_JETTY_PORT}"
     volumes:
       - jhuda-assets:/data
     depends_on:
