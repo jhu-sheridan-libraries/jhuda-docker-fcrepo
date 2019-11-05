@@ -46,6 +46,8 @@ COPY run_tests.sh /
 
 COPY web.xml webapps/fcrepo/WEB-INF/
 
+COPY fcrepo-config.xml webapps/fcrepo/WEB-INF/classes/spring
+
 VOLUME /data
 
 EXPOSE ${FCREPO_JETTY_PORT}
