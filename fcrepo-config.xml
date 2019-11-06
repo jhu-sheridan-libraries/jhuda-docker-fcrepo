@@ -50,11 +50,11 @@
          ************************** -->
 
     <!-- Optional PrincipalProvider filter that will inspect the request header, "some-header", for user role values -->
-    <bean name="headerProvider" class="org.fcrepo.auth.common.HttpHeaderPrincipalProvider">
-        <property name="headerName" value="jhuda-roles"/>
+<!--    <bean name="headerProvider" class="org.fcrepo.auth.common.HttpHeaderPrincipalProvider">-->
+<!--        <property name="headerName" value="REMOTE_USER"/>-->
 
-        <property name="separator" value=","/>
-    </bean>
+<!--        <property name="separator" value=","/>-->
+<!--    </bean>-->
 
     <!-- Optional PrincipalProvider filter that will use container configured roles as principals -->
     <!--
@@ -112,7 +112,7 @@
         <value>
           <!-- The Auth filter should come first, followed by 0 or more of the principal provider filters, -->
           <!-- and finally the webACFilter -->
-          /** = servletContainerAuthFilter,delegatedPrincipalProvider,headerProvider,webACFilter
+          /** = servletContainerAuthFilter,delegatedPrincipalProvider,webACFilter
         </value>
       </property>
     </bean>

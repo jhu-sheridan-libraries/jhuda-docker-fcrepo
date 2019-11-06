@@ -11,6 +11,10 @@ JSONLD_STRICT=true \
 JSONLD_CONTEXT_PERSIST=true \
 JSONLD_CONTEXT_MINIMAL=true
 
+ADD pom.xml /
+
+ADD src/ /src/
+
 RUN apk add --no-cache openjdk8-jre openjdk8 && \
     wget -O jetty.tar.gz ${JETTY_BIN} && \
     tar -xzf jetty.tar.gz && \
@@ -23,9 +27,11 @@ RUN apk add --no-cache openjdk8-jre openjdk8 && \
     cd ../ && \
     rm fcrepo.war && \
     cd .. / && \
-    apk del openjdk8 && \
-    mkdir start.d && \
     mkdir /data
+
+RUN apk add --no-cache maven && \
+    mvn package && \
+    cp target/jetty-shib-loginservice-0.0.1-SNAPSHOT.jar /
 
 WORKDIR /jetty-distribution-${JETTY_VER}
 
@@ -36,8 +42,6 @@ RUN wget -O webapps/fcrepo/WEB-INF/lib/jsonld-addon-filters-${JSONLD_ADDON_VERSI
 
 ADD fcrepo-realm.xml fcrepo-realm.properties etc/
 
-ADD fcrepo.ini start.d/
-
 COPY fedora-env.sh /
 
 COPY init-fedora.sh /
@@ -47,6 +51,15 @@ COPY run_tests.sh /
 COPY web.xml webapps/fcrepo/WEB-INF/
 
 COPY fcrepo-config.xml webapps/fcrepo/WEB-INF/classes/spring
+
+COPY fcrepo.xml webapps/
+
+# See https://www.eclipse.org/jetty/documentation/9.4.x/startup-modules.html#start-vs-startd
+RUN mv /jetty-shib-loginservice-0.0.1-SNAPSHOT.jar lib/ext && \
+    java -jar ./start.jar --create-startd && \
+    java -jar ./start.jar --add-to-start=debug,debuglog,http-forwarded
+
+ADD fcrepo.ini start.d/
 
 VOLUME /data
 

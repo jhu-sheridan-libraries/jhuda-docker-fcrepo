@@ -146,10 +146,34 @@
     </user-data-constraint>
   </security-constraint>
 
-  <login-config>
-    <auth-method>BASIC</auth-method>
-    <realm-name>fcrepo</realm-name>
-  </login-config>
+<!--  <login-config>-->
+<!--    <auth-method>BASIC</auth-method>-->
+<!--    <realm-name>fcrepo</realm-name>-->
+<!--  </login-config>-->
 
+<!--  <security-constraint>-->
+<!--    <web-resource-collection>-->
+<!--      <url-pattern>/*</url-pattern>-->
+<!--      <http-method>OPTIONS</http-method>-->
+<!--    </web-resource-collection>-->
+<!--  </security-constraint>-->
+
+<!--  <security-constraint>-->
+<!--    <web-resource-collection>-->
+<!--      <url-pattern>/</url-pattern>-->
+<!--      <http-method-omission>OPTIONS</http-method-omission>-->
+<!--    </web-resource-collection>-->
+<!--    <auth-constraint>-->
+<!--      <role-name>**</role-name>-->
+<!--    </auth-constraint>-->
+<!--    <user-data-constraint>-->
+<!--      <transport-guarantee>NONE</transport-guarantee>-->
+<!--    </user-data-constraint>-->
+<!--  </security-constraint>-->
+
+<!--  <login-config>-->
+<!--    <auth-method>BASIC</auth-method>-->
+<!--    <realm-name>fcrepo</realm-name>-->
+<!--  </login-config>-->
 
 </web-app>
