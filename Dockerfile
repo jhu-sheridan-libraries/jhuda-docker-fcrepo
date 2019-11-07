@@ -44,8 +44,6 @@ RUN wget -O webapps/fcrepo/WEB-INF/lib/jsonld-addon-filters-${JSONLD_ADDON_VERSI
     echo "53883365d715e64bf55ec0e433a2266f9374254e *webapps/fcrepo/WEB-INF/lib/jsonld-addon-filters-${JSONLD_ADDON_VERSION}-shaded.jar" \
         | sha1sum -c -
 
-ADD fcrepo-realm.xml fcrepo-realm.properties etc/
-
 COPY fedora-env.sh /
 
 COPY init-fedora.sh /
@@ -57,6 +55,9 @@ COPY web.xml webapps/fcrepo/WEB-INF/
 COPY fcrepo-config.xml webapps/fcrepo/WEB-INF/classes/spring
 
 COPY fcrepo.xml webapps/
+
+# Fedora basic auth users and roles
+ADD fcrepo-realm.properties etc/
 
 # See https://www.eclipse.org/jetty/documentation/9.4.x/startup-modules.html#start-vs-startd
 RUN mv /jetty-shib-loginservice-0.0.1-SNAPSHOT.jar lib/ext && \
