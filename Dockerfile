@@ -11,9 +11,7 @@ JSONLD_STRICT=true \
 JSONLD_CONTEXT_PERSIST=true \
 JSONLD_CONTEXT_MINIMAL=true
 
-ADD pom.xml /
-
-ADD src/ /src/
+ADD jetty-shib-authenticator /jetty-shib-authenticator
 
 RUN apk add --no-cache openjdk8-jre openjdk8 && \
     wget -O jetty.tar.gz ${JETTY_BIN} && \
@@ -28,10 +26,10 @@ RUN apk add --no-cache openjdk8-jre openjdk8 && \
     rm fcrepo.war && \
     cd .. / && \
     mkdir /data && \
-    cd / && \
+    cd /jetty-shib-authenticator && \
     apk add --no-cache maven && \
     mvn package && \
-    cp target/jetty-shib-loginservice-0.0.1-SNAPSHOT.jar / && \
+    cp target/jetty-shib-authenticator-0.0.1-SNAPSHOT.jar / && \
     rm -rf target && \
     apk del openjdk8 && \
     apk del maven && \
@@ -62,7 +60,7 @@ COPY fcrepo.xml webapps/
 ADD fcrepo-realm.properties etc/
 
 # See https://www.eclipse.org/jetty/documentation/9.4.x/startup-modules.html#start-vs-startd
-RUN mv /jetty-shib-loginservice-0.0.1-SNAPSHOT.jar lib/ext && \
+RUN mv /jetty-shib-authenticator-0.0.1-SNAPSHOT.jar lib/ext && \
     java -jar ./start.jar --create-startd && \
     java -jar ./start.jar --add-to-start=http-forwarded
 
