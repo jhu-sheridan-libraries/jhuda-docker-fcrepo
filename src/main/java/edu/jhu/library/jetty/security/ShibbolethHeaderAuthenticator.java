@@ -20,8 +20,6 @@ package edu.jhu.library.jetty.security;
 
 import org.eclipse.jetty.security.Authenticator;
 import org.eclipse.jetty.security.ServerAuthException;
-import org.eclipse.jetty.security.authentication.BasicAuthenticator;
-import org.eclipse.jetty.security.authentication.DeferredAuthentication;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -45,7 +43,7 @@ import java.util.stream.Collectors;
  */
 public class ShibbolethHeaderAuthenticator implements Authenticator {
 
-    private static final Logger LOG = Log.getLogger(ShibbolethHeaderAuthenticator.class);
+    private static final Logger LOG = Log.getLogger(Authenticator.class);
 
     private AuthConfiguration configuration;
 
@@ -61,6 +59,11 @@ public class ShibbolethHeaderAuthenticator implements Authenticator {
      * Principals (every authenticated user will have the same set of roles supplied by this field).
      */
     private String defaultRoles;
+
+    /**
+     * If the incoming request does not contain a Principal, this authenticator is used instead
+     */
+    private Authenticator fallbackAuthenticator;
 
     @Override
     public void setConfiguration(AuthConfiguration configuration) {
@@ -83,8 +86,8 @@ public class ShibbolethHeaderAuthenticator implements Authenticator {
      * matching the HTTP header supplied by {@link #setHeaderName(String)} and returning its value.  User roles
      * supplied by {@link #setDefaultRoles(String)} will be consulted by {@link HttpServletRequest#isUserInRole(String)}.
      * <p>
-     * If the wrapped request does encapsulate a Principal, a {@link DeferredAuthentication} is returned which utilizes
-     * BASIC auth.
+     * If the wrapped request does encapsulate a Principal, the {@link #getFallbackAuthenticator() fallback}
+     * Authenticator will be used.
      * </p>
      *
      * @param request the incoming request which will be wrapped by this method
@@ -96,7 +99,7 @@ public class ShibbolethHeaderAuthenticator implements Authenticator {
     @Override
     public Authentication validateRequest(ServletRequest request, ServletResponse response, boolean mandatory)
             throws ServerAuthException {
-        LOG.debug("Validating request ...");
+        LOG.debug("{} validating request ...", ShibbolethHeaderAuthenticator.class.getSimpleName());
 
         ExtractedPrincipalWrapper extractedPrincipalWrapper =
                 new ExtractedPrincipalWrapper((HttpServletRequest) request,
@@ -104,7 +107,8 @@ public class ShibbolethHeaderAuthenticator implements Authenticator {
                         Arrays.stream(defaultRoles.split(",")).collect(Collectors.toSet()));
 
         if (extractedPrincipalWrapper.principalFound()) {
-            LOG.debug("{} extracted Principal: {}", ExtractedPrincipalWrapper.class.getSimpleName(), extractedPrincipalWrapper.getRemoteUser());
+            LOG.debug("{} extracted Principal: {}",
+                    ExtractedPrincipalWrapper.class.getSimpleName(), extractedPrincipalWrapper.getRemoteUser());
 
             return new Authentication.Wrapped() {
                 @Override
@@ -119,12 +123,14 @@ public class ShibbolethHeaderAuthenticator implements Authenticator {
             };
         }
 
-        LOG.debug("{} returning {}", ExtractedPrincipalWrapper.class.getSimpleName(), DeferredAuthentication.class.getSimpleName());
-        return new DeferredAuthentication(new BasicAuthenticator());
+        LOG.debug("{} did not find a Principal, falling back on {}  ...",
+                ShibbolethHeaderAuthenticator.class.getSimpleName(), fallbackAuthenticator.getClass().getSimpleName());
+        return fallbackAuthenticator.validateRequest(request, response, mandatory);
     }
 
     @Override
-    public boolean secureResponse(ServletRequest request, ServletResponse response, boolean mandatory, Authentication.User validatedUser) throws ServerAuthException {
+    public boolean secureResponse(ServletRequest request, ServletResponse response, boolean mandatory,
+                                  Authentication.User validatedUser) throws ServerAuthException {
         return false;
     }
 
@@ -146,5 +152,13 @@ public class ShibbolethHeaderAuthenticator implements Authenticator {
 
     public void setDefaultRoles(String defaultRoles) {
         this.defaultRoles = defaultRoles;
+    }
+
+    public Authenticator getFallbackAuthenticator() {
+        return fallbackAuthenticator;
+    }
+
+    public void setFallbackAuthenticator(Authenticator fallbackAuthenticator) {
+        this.fallbackAuthenticator = fallbackAuthenticator;
     }
 }

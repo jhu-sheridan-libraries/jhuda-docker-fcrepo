@@ -20,23 +20,47 @@
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_4.dtd">
 
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
-<!--    <Set name="contextPath">/fcrepo</Set>-->
-<!--    <Set name="war">/opt/myapp/myapp.war</Set>-->
-<!--    <Set name="resource">-->
-<!--        <New class="org.eclipse.jetty.util.resource.PathResource">-->
-<!--            <Arg-->
-<!--        </New>-->
-<!--    </Set>-->
-<!--    <Set name="resourceBase">./fcrepo</Set>-->
-
     <Set name="contextPath">/fcrepo</Set>
     <Set name="war"><SystemProperty name="jetty.home" default="."/>/webapps/fcrepo</Set>
-    <Get name="securityHandler">
+    <Get name="securityHandler" id="fcrepoSecurityHandler">
+        <Set name="identityService" id="fcrepoIdService">
+            <New class="org.eclipse.jetty.security.DefaultIdentityService"/>
+        </Set>
+        <Set name="loginService">
+            <New class="org.eclipse.jetty.security.HashLoginService" id="hashLoginService">
+                <Set name="name"><Property name="jhuda.fcrepo.authrealm" default="fcrepo"/></Set>
+                <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/fcrepo-realm.properties</Set>
+                <Set name="identityService">
+                    <Ref refid="fcrepoIdService"/>
+                </Set>
+            </New>
+        </Set>
+        <Set name="realmName"><Property name="jhuda.fcrepo.authrealm" default="fcrepo"/></Set>
         <Set name="authenticator">
-            <New class="edu.jhu.library.jetty.security.ShibbolethHeaderAuthenticator">
-                <Set name="headerName"><Property name="jhuda.shib.authheader" default="On-Behalf-Of"/></Set>
-                <Set name="defaultRoles"><Property name="jhuda.shib.roles" default="fedoraUser"/></Set>
+            <New class="edu.jhu.library.jetty.security.ShibbolethHeaderAuthenticator" id="shibAuthenticator">
+                <Set name="configuration"><Ref refid="fcrepoSecurityHandler"/></Set>
+                <Set name="headerName"><Property name="jhuda.fcrepo.authheader" default="On-Behalf-Of"/></Set>
+                <Set name="defaultRoles"><Property name="jhuda.fcrepo.roles" default="fedoraUser"/></Set>
+                <Set name="fallbackAuthenticator">
+                    <New class="org.eclipse.jetty.security.authentication.BasicAuthenticator">
+                        <Set name="configuration">
+                            <Ref refid="fcrepoSecurityHandler"/>
+                        </Set>
+                    </New>
+                </Set>
             </New>
         </Set>
     </Get>
+
+    <!-- Set the fallback Authenticator after the security handler has fully initialized with an IdentityService. -->
+<!--    <Ref refid="shibAuthenticator">-->
+<!--        <Set name="fallbackAuthenticator">-->
+<!--            <New class="org.eclipse.jetty.security.authentication.BasicAuthenticator">-->
+<!--                <Set name="configuration">-->
+<!--                    <Ref refid="fcrepoSecurityHandler"/>-->
+<!--                </Set>-->
+<!--            </New>-->
+<!--        </Set>-->
+<!--    </Ref>-->
+
 </Configure>

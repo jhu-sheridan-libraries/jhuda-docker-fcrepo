@@ -84,7 +84,7 @@ public class ExtractedPrincipalWrapper extends HttpServletRequestWrapper {
     public Principal getUserPrincipal() {
         return extract(underlyingRequest, userHeader)
                 .map(user -> (Principal) () -> user)
-                .orElse(() -> null);
+                .orElse(null);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ExtractedPrincipalWrapper extends HttpServletRequestWrapper {
      * @return the trimmed value of the header, or {@code null} if the header is missing or has a zero-length string as
      *         its value
      */
-    private static Optional<String> extract(HttpServletRequest underlyingRequest, String userHeader) {
+    static Optional<String> extract(HttpServletRequest underlyingRequest, String userHeader) {
         return Optional.ofNullable(underlyingRequest.getHeader(userHeader))
                 .map(String::trim)
                 .map(value -> "".equals(value) ? null : value);

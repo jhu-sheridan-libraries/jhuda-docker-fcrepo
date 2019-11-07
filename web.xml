@@ -171,9 +171,9 @@
 <!--    </user-data-constraint>-->
 <!--  </security-constraint>-->
 
-<!--  <login-config>-->
-<!--    <auth-method>BASIC</auth-method>-->
-<!--    <realm-name>fcrepo</realm-name>-->
-<!--  </login-config>-->
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>fcrepo</realm-name>
+  </login-config>
 
 </web-app>
