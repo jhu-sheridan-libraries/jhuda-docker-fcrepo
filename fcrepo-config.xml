@@ -112,7 +112,7 @@
         <value>
           <!-- The Auth filter should come first, followed by 0 or more of the principal provider filters, -->
           <!-- and finally the webACFilter -->
-          /** = servletContainerAuthFilter,headerProvider,delegatedPrincipalProvider,webACFilter
+          /** = servletContainerAuthFilter,delegatedPrincipalProvider,headerProvider,webACFilter
         </value>
       </property>
     </bean>
