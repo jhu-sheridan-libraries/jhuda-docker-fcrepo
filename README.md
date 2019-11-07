@@ -24,9 +24,10 @@ Provides the Fedora repository image used by the JHU Data Archive.  Notably the 
 |Base directory containing Fedora repository assets|`FCREPO_DATA_DIR`|`/data/fcrepo`|
 |Default log level for Fedora|`FCREPO_LOGLEVEL`|`DEBUG`|
 |Modeshape configuration file (a Spring Resource URI)|`FCREPO_MODESHAPE_CONFIG`|`classpath:/config/file-simple/repository.json`|
-|Shibboleth SP HTTP header containing the authenticated username|`FCREPO_AUTH_HEADER`|`REMOTE_USER`|
-|Role(s) assigned to Shibboleth authentiated users (CSV string)|`FCREPO_AUTH_ROLES`|`fedoraUser`|
 |Default log level for Fedora authentication|`FCREPO_AUTH_LOGLEVEL`|`DEBUG`|
+|Shibboleth SP HTTP header containing the authenticated username|`FCREPO_SP_AUTH_HEADER`|`REMOTE_USER`|
+|Role(s) assigned to Shibboleth authentiated users (CSV string)|`FCREPO_SP_AUTH_ROLES`|`fedoraUser`|
+
 
 ## Build Arguments
 

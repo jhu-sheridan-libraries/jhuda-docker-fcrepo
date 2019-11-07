@@ -41,6 +41,6 @@ java -jar start.jar \
   -Dfcrepo.home=${FCREPO_DATA_DIR}  \
   -Dfcrepo.log=${FCREPO_LOGLEVEL} \
   -Dfcrepo.log.auth=${FCREPO_AUTH_LOGLEVEL} \
-  -Djhuda.fcrepo.authheader=${FCREPO_AUTH_HEADER} \
-  -Djhuda.fcrepo.roles=${FCREPO_AUTH_ROLES} \
+  -Djhuda.fcrepo.authheader=${FCREPO_SP_AUTH_HEADER} \
+  -Djhuda.fcrepo.roles=${FCREPO_SP_AUTH_ROLES} \
   -Djhuda.fcrepo.authrealm=${FCREPO_AUTH_REALM}
