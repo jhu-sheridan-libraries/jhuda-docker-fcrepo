@@ -35,4 +35,12 @@ then
 fi
 
 echo "Starting Fedora..."
-java -jar start.jar -Djetty.http.port=${FCREPO_JETTY_PORT}
+java -jar start.jar \
+  -Djetty.http.port=${FCREPO_JETTY_PORT} \
+  -Dfcrepo.modeshape.configuration=${FCREPO_MODESHAPE_CONFIG} \
+  -Dfcrepo.home=${FCREPO_DATA_DIR}  \
+  -Dfcrepo.log=${FCREPO_LOGLEVEL} \
+  -Dfcrepo.log.auth=${FCREPO_AUTH_LOGLEVEL} \
+  -Djhuda.fcrepo.authheader=${FCREPO_AUTH_HEADER} \
+  -Djhuda.fcrepo.roles=${FCREPO_AUTH_ROLES} \
+  -Djhuda.fcrepo.authrealm=${FCREPO_AUTH_REALM}

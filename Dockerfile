@@ -70,9 +70,6 @@ RUN if [ "${ENABLE_CONTAINER_DEBUG}" = "true" ] ; then \
  java -jar ./start.jar --add-to-start=debug,debuglog ; \
  fi
 
-# Contains Fedora system properties set at runtime
-ADD fcrepo.ini start.d/
-
 VOLUME /data
 
 EXPOSE ${FCREPO_JETTY_PORT}
