@@ -61,7 +61,14 @@ COPY fcrepo.xml webapps/
 # See https://www.eclipse.org/jetty/documentation/9.4.x/startup-modules.html#start-vs-startd
 RUN mv /jetty-shib-loginservice-0.0.1-SNAPSHOT.jar lib/ext && \
     java -jar ./start.jar --create-startd && \
-    java -jar ./start.jar --add-to-start=debug,debuglog,http-forwarded
+    java -jar ./start.jar --add-to-start=http-forwarded
+
+# when true, enables the debug,debuglog Jetty modules at *build*
+ARG ENABLE_CONTAINER_DEBUG=false
+
+RUN if [ "${ENABLE_CONTAINER_DEBUG}" = "true" ] ; then \
+ java -jar ./start.jar --add-to-start=debug,debuglog ; \
+ fi
 
 ADD fcrepo.ini start.d/
 
