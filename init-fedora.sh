@@ -9,7 +9,7 @@ env | sort -u
 
 if [ ! -d ${FCREPO_DATA_DIR} ] ;
 then
-  mkdir ${FCREPO_DATA_DIR}
+  mkdir -p ${FCREPO_DATA_DIR}
 fi
 
 echo "Starting Fedora..."
