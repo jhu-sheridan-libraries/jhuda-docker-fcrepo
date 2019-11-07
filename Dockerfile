@@ -1,39 +1,53 @@
-FROM alpine:3.10.2
-
-ENV JETTY_VER=9.4.20.v20190813
-ENV JETTY_BIN=https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/${JETTY_VER}/jetty-distribution-${JETTY_VER}.tar.gz
-ENV FCREPO_JETTY_PORT=8080
-ENV FEDORA_VER=5.1.0
-ENV FEDORA_BIN=https://github.com/fcrepo4/fcrepo4/releases/download/fcrepo-${FEDORA_VER}/fcrepo-webapp-${FEDORA_VER}.war
-ENV JSONLD_ADDON_VERSION=0.0.6 \
-COMPACTION_URI=https://oa-pass.github.io/pass-data-model/src/main/resources/context-3.4.jsonld \
-JSONLD_STRICT=true \
-JSONLD_CONTEXT_PERSIST=true \
-JSONLD_CONTEXT_MINIMAL=true
+FROM maven:3.6.2-jdk-8-slim
 
 ADD jetty-shib-authenticator /jetty-shib-authenticator
 
-RUN apk add --no-cache openjdk8-jre openjdk8 && \
-    wget -O jetty.tar.gz ${JETTY_BIN} && \
+RUN cd /jetty-shib-authenticator && \
+    mvn package
+
+FROM openjdk:8-jdk-slim
+
+ENV JETTY_VER=9.4.20.v20190813
+ENV JETTY_BIN=https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/${JETTY_VER}/jetty-distribution-${JETTY_VER}.tar.gz
+ENV FEDORA_VER=5.1.0
+ENV FEDORA_BIN=https://github.com/fcrepo4/fcrepo4/releases/download/fcrepo-${FEDORA_VER}/fcrepo-webapp-${FEDORA_VER}.war
+
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -Lo jetty.tar.gz ${JETTY_BIN} && \
     tar -xzf jetty.tar.gz && \
     rm -rf jetty.tar.gz && \
     cd jetty-distribution-${JETTY_VER}/webapps && \
-    wget -O fcrepo.war ${FEDORA_BIN} && \
+    curl -Lo fcrepo.war ${FEDORA_BIN} && \
     mkdir fcrepo && \
     cd fcrepo && \
-    /usr/lib/jvm/java-1.8-openjdk/bin/jar -xf ../fcrepo.war && \
+    jar -xf ../fcrepo.war && \
     cd ../ && \
-    rm fcrepo.war && \
-    cd .. / && \
-    mkdir /data && \
-    cd /jetty-shib-authenticator && \
-    apk add --no-cache maven && \
-    mvn package && \
-    cp target/jetty-shib-authenticator-0.0.1-SNAPSHOT.jar / && \
-    rm -rf target && \
-    apk del openjdk8 && \
-    apk del maven && \
-    rm -rf ~/.m2
+    rm fcrepo.war
+
+FROM alpine:3.10.2
+
+ENV JETTY_VER=9.4.20.v20190813
+ENV FCREPO_JETTY_PORT=8080
+ENV JSONLD_ADDON_VERSION=0.0.6 \
+    COMPACTION_URI=https://oa-pass.github.io/pass-data-model/src/main/resources/context-3.4.jsonld \
+    JSONLD_STRICT=true \
+    JSONLD_CONTEXT_PERSIST=true \
+    JSONLD_CONTEXT_MINIMAL=true
+ENV FCREPO_BASE_URI=http://localhost:8080/fcrepo/rest \
+    FCREPO_USER=fedoraAdmin \
+    FCREPO_PASS=moo \
+    FCREPO_DATA_DIR=/data/fcrepo \
+    FCREPO_SP_AUTH_HEADER=REMOTE_USER \
+    FCREPO_SP_AUTH_ROLES=fedoraUser \
+    FCREPO_AUTH_REALM=fcrepo \
+    FCREPO_AUTH_LOGLEVEL=DEBUG \
+    FCREPO_MODESHAPE_CONFIG=classpath:/config/file-simple/repository.json \
+    FCREPO_LOGLEVEL=DEBUG
+
+COPY --from=1 /jetty-distribution-${JETTY_VER}/ /jetty-distribution-${JETTY_VER}/
+
+COPY --from=0 /jetty-shib-authenticator/target/jetty-shib-authenticator-0.0.1-SNAPSHOT.jar /jetty-distribution-${JETTY_VER}/lib/ext
 
 WORKDIR /jetty-distribution-${JETTY_VER}
 
@@ -60,7 +74,7 @@ COPY fcrepo.xml webapps/
 ADD fcrepo-realm.properties etc/
 
 # See https://www.eclipse.org/jetty/documentation/9.4.x/startup-modules.html#start-vs-startd
-RUN mv /jetty-shib-authenticator-0.0.1-SNAPSHOT.jar lib/ext && \
+RUN apk add --no-cache openjdk8-jre && \
     java -jar ./start.jar --create-startd && \
     java -jar ./start.jar --add-to-start=http-forwarded
 
@@ -69,6 +83,8 @@ ARG ENABLE_CONTAINER_DEBUG=false
 RUN if [ "${ENABLE_CONTAINER_DEBUG}" = "true" ] ; then \
  java -jar ./start.jar --add-to-start=debug,debuglog ; \
  fi
+
+RUN mkdir /data
 
 VOLUME /data
 
