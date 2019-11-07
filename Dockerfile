@@ -27,11 +27,15 @@ RUN apk add --no-cache openjdk8-jre openjdk8 && \
     cd ../ && \
     rm fcrepo.war && \
     cd .. / && \
-    mkdir /data
-
-RUN apk add --no-cache maven && \
+    mkdir /data && \
+    cd / && \
+    apk add --no-cache maven && \
     mvn package && \
-    cp target/jetty-shib-loginservice-0.0.1-SNAPSHOT.jar /
+    cp target/jetty-shib-loginservice-0.0.1-SNAPSHOT.jar / && \
+    rm -rf target && \
+    apk del openjdk8 && \
+    apk del maven && \
+    rm -rf ~/.m2
 
 WORKDIR /jetty-distribution-${JETTY_VER}
 
