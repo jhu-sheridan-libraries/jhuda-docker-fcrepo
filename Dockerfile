@@ -52,8 +52,10 @@ COPY run_tests.sh /
 
 COPY web.xml webapps/fcrepo/WEB-INF/
 
+# Fedora Spring context with the optional headerProvider enabled
 COPY fcrepo-config.xml webapps/fcrepo/WEB-INF/classes/spring
 
+# Context descriptor configuring Fedora's custom authentication stack
 COPY fcrepo.xml webapps/
 
 # Fedora basic auth users and roles
@@ -66,11 +68,11 @@ RUN mv /jetty-shib-loginservice-0.0.1-SNAPSHOT.jar lib/ext && \
 
 # when true, enables the debug,debuglog Jetty modules at *build*
 ARG ENABLE_CONTAINER_DEBUG=false
-
 RUN if [ "${ENABLE_CONTAINER_DEBUG}" = "true" ] ; then \
  java -jar ./start.jar --add-to-start=debug,debuglog ; \
  fi
 
+# Contains Fedora system properties set at runtime
 ADD fcrepo.ini start.d/
 
 VOLUME /data
