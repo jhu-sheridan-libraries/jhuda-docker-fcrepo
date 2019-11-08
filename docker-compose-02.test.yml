@@ -1,0 +1,86 @@
+version: '3.1'
+
+services:
+
+  sut:
+    image: golang:alpine3.10
+    working_dir: /go/src
+    command: go test -v ./...
+    env_file: .env
+    environment:
+      - CGO_ENABLED=0
+      - FCREPO_BASE_URI=http://fcrepo:8080/fcrepo/rest
+      - SP_BASE_URI=http://sp/fcrepo/rest
+    volumes:
+      - "./fcrepo-image-test:/go/src"
+    depends_on:
+      - fcrepo
+      - activemq
+      - ldap
+      - sp
+      - idp
+
+  fcrepo:
+    image: jhuda/fcrepo:latest
+    container_name: fcrepo
+    env_file: .env
+    volumes:
+      - jhuda-data:/data
+    depends_on:
+      - assets
+      - activemq
+
+  activemq:
+    image: jhuda/activemq:latest
+    container_name: activemq
+
+  idp:
+    image: jhuda/idp:latest
+    container_name: idp
+    depends_on:
+      - ldap
+    environment:
+      - JETTY_MAX_HEAP=64m
+      - JETTY_BROWSER_SSL_KEYSTORE_PASSWORD=password
+      - JETTY_BACKCHANNEL_SSL_KEYSTORE_PASSWORD=password
+    expose:
+      - "4443"
+    secrets:
+      - source: idp_backchannel
+      - source: idp_browser
+      - source: idp_encryption
+      - source: idp_signing
+      - source: idp_sealer
+
+  sp:
+    image: jhuda/sp:latest
+    container_name: sp
+    secrets:
+      - source: sp_key
+
+  ldap:
+    image: jhuda/ldap:latest
+    container_name: ldap
+
+  assets:
+    image: jhuda/assets:latest
+    volumes:
+      - jhuda-data:/data
+
+volumes:
+  jhuda-data:
+    driver: local
+
+secrets:
+  idp_backchannel:
+    file: ./secrets/idp/idp-backchannel.p12
+  idp_browser:
+    file: ./secrets/idp/idp-browser.p12
+  idp_encryption:
+    file: ./secrets/idp/idp-encryption.key
+  idp_signing:
+    file: ./secrets/idp/idp-signing.key
+  idp_sealer:
+    file: ./secrets/idp/sealer.jks
+  sp_key:
+    file: ./secrets/sp/sp-key.pem
