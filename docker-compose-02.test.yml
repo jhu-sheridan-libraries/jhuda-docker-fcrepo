@@ -10,9 +10,11 @@ services:
     environment:
       - CGO_ENABLED=0
       - FCREPO_BASE_URI=http://fcrepo:8080/fcrepo/rest
-      - SP_BASE_URI=http://sp/fcrepo/rest
+      - PUBLIC_BASE_URI=https://archive.local/fcrepo/rest
     volumes:
       - "./fcrepo-image-test:/go/src"
+    networks:
+      - front
     depends_on:
       - fcrepo
       - activemq
@@ -26,6 +28,8 @@ services:
     env_file: .env
     volumes:
       - jhuda-data:/data
+    networks:
+      - front
     depends_on:
       - assets
       - activemq
@@ -33,6 +37,8 @@ services:
   activemq:
     image: jhuda/activemq:latest
     container_name: activemq
+    networks:
+      - front
 
   idp:
     image: jhuda/idp:latest
@@ -43,6 +49,8 @@ services:
       - JETTY_MAX_HEAP=64m
       - JETTY_BROWSER_SSL_KEYSTORE_PASSWORD=password
       - JETTY_BACKCHANNEL_SSL_KEYSTORE_PASSWORD=password
+    networks:
+      - front
     expose:
       - "4443"
     secrets:
@@ -55,17 +63,37 @@ services:
   sp:
     image: jhuda/sp:latest
     container_name: sp
+    networks:
+      - front
     secrets:
       - source: sp_key
 
   ldap:
     image: jhuda/ldap:latest
     container_name: ldap
+    networks:
+      - front
 
   assets:
     image: jhuda/assets:latest
     volumes:
       - jhuda-data:/data
+    networks:
+      - front
+
+  proxy:
+    image: jhuda/proxy:latest
+    container_name: proxy
+    networks:
+      front:
+        aliases:
+          - archive.local
+    ports:
+      - "80:80"
+      - "443:443"
+
+networks:
+  front:
 
 volumes:
   jhuda-data:

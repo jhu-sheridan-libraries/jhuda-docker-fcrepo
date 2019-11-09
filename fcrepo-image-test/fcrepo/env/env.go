@@ -14,7 +14,7 @@ type FcrepoEnv struct {
 	ModeConfig,
 	LogLevel,
 	AuthLogLevel,
-	SpBaseUri string
+	PublicBaseUri string
 }
 
 // answers a struct containing known Docker environment variables used by the
@@ -33,6 +33,6 @@ func New() FcrepoEnv {
 		LogLevel:     os.ExpandEnv("${FCREPO_LOGLEVEL}"),
 		AuthLogLevel: os.ExpandEnv("${FCREPO_AUTH_LOGLEVEL}"),
 		// Note the following env var is for testing only, *not* present or used in the production image
-		SpBaseUri: os.ExpandEnv("${SP_BASE_URI}"),
+		PublicBaseUri: os.ExpandEnv("${PUBLIC_BASE_URI}"),
 	}
 }

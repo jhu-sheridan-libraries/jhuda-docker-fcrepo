@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fcrepo-image-test/fcrepo/env"
 	"fmt"
 	"github.com/saopayne/gsoup"
@@ -63,8 +64,14 @@ func Test_UserPassOk(t *testing.T) {
 // accessing the repository via the shibboleth SP without providing authentication should result in redirection to the
 // login form
 func Test_SpAuthChallenge(t *testing.T) {
-	res, err := http.Get(fcrepoEnv.SpBaseUri)
-	assert.Nilf(t, err, "Error loading %v: %v", fcrepoEnv.SpBaseUri, err)
+	// Dangerous but don't verify the server cert
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	res, err := client.Get(fcrepoEnv.PublicBaseUri)
+	assert.Nilf(t, err, "Error loading %v: %v", fcrepoEnv.PublicBaseUri, err)
 	defer res.Body.Close()
 
 	assert.Equal(t, 200, res.StatusCode)
@@ -75,4 +82,40 @@ func Test_SpAuthChallenge(t *testing.T) {
 	doc := gsoup.HTMLParse(string(b))
 	title := doc.Find("title").Text()
 	assert.Equal(t, "Web Login Service", title)
+
+	// TODO a test for submitting the form and verifying login
+	/*
+	/html/body/div/div/div/div[1]/form
+
+	<form action="/idp/profile/SAML2/Redirect/SSO?execution=e1s1" method="post">
+
+
+	                          <div class="form-element-wrapper">
+	                <label for="username">Username</label>
+	                <input class="form-element form-field" id="username" name="j_username" type="text" value="">
+	              </div>
+
+	              <div class="form-element-wrapper">
+	                <label for="password">Password</label>
+	                <input class="form-element form-field" id="password" name="j_password" type="password" value="">
+	              </div>
+
+	                                          <div class="form-element-wrapper">
+	                <input type="checkbox" name="donotcache" value="1" id="donotcache">
+	                <label for="donotcache">Don't Remember Login</label>
+	               </div>
+
+
+	              <div class="form-element-wrapper">
+	                <input id="_shib_idp_revokeConsent" type="checkbox" name="_shib_idp_revokeConsent" value="true">
+	                <label for="_shib_idp_revokeConsent">Clear prior granting of permission for release of your information to this service.</label>
+	              </div>
+
+	                          <div class="form-element-wrapper">
+	                <button class="form-element form-button" type="submit" name="_eventId_proceed" onclick="this.childNodes[0].nodeValue='Logging in, please wait...'">Login</button>
+	              </div>
+
+	                        </form>
+	<button class="form-element form-button" type="submit" name="_eventId_proceed" onclick="this.childNodes[0].nodeValue='Logging in, please wait...'">Login</button>
+	 */
 }
