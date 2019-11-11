@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 	// wait for Fedora to be up (which in and of itself is a test)
 	start := time.Now()
 	var elapsed time.Duration
-	timeout := time.Second * 120
+	timeout := time.Minute * 5
 	rc := -1
 	for (rc > 499 || rc < 0) && !timedout(start, timeout) {
 		if res, err := http.Get(fcrepoEnv.BaseUri); err == nil {
