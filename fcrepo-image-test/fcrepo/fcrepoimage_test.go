@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 	// wait for Fedora to be up (which in and of itself is a test)
 	start := time.Now()
 	var elapsed time.Duration
-	timeout := time.Second * 60
+	timeout := time.Second * 120
 	rc := -1
 	for (rc > 499 || rc < 0) && !timedout(start, timeout) {
 		if res, err := http.Get(fcrepoEnv.BaseUri); err == nil {
@@ -122,40 +122,4 @@ func Test_SpAuthChallenge(t *testing.T) {
 	doc := gsoup.HTMLParse(string(b))
 	title := doc.Find("title").Text()
 	assert.Equal(t, "Web Login Service", title)
-
-	// TODO a test for submitting the form and verifying login
-	/*
-		/html/body/div/div/div/div[1]/form
-
-		<form action="/idp/profile/SAML2/Redirect/SSO?execution=e1s1" method="post">
-
-
-		                          <div class="form-element-wrapper">
-		                <label for="username">Username</label>
-		                <input class="form-element form-field" id="username" name="j_username" type="text" value="">
-		              </div>
-
-		              <div class="form-element-wrapper">
-		                <label for="password">Password</label>
-		                <input class="form-element form-field" id="password" name="j_password" type="password" value="">
-		              </div>
-
-		                                          <div class="form-element-wrapper">
-		                <input type="checkbox" name="donotcache" value="1" id="donotcache">
-		                <label for="donotcache">Don't Remember Login</label>
-		               </div>
-
-
-		              <div class="form-element-wrapper">
-		                <input id="_shib_idp_revokeConsent" type="checkbox" name="_shib_idp_revokeConsent" value="true">
-		                <label for="_shib_idp_revokeConsent">Clear prior granting of permission for release of your information to this service.</label>
-		              </div>
-
-		                          <div class="form-element-wrapper">
-		                <button class="form-element form-button" type="submit" name="_eventId_proceed" onclick="this.childNodes[0].nodeValue='Logging in, please wait...'">Login</button>
-		              </div>
-
-		                        </form>
-		<button class="form-element form-button" type="submit" name="_eventId_proceed" onclick="this.childNodes[0].nodeValue='Logging in, please wait...'">Login</button>
-	*/
 }
