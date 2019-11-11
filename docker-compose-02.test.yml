@@ -23,7 +23,9 @@ services:
       - idp
 
   fcrepo:
-    image: jhuda/fcrepo:this
+    image: jhuda/fcrepo:latest
+    build:
+      context: .
     container_name: fcrepo
     env_file: .env
     volumes:
