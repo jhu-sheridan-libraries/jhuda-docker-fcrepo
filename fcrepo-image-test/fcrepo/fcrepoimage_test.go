@@ -17,12 +17,15 @@ import (
 var fcrepoEnv = env.New()
 
 var service_deps = map[string]bool{
-	"ldap:389":       false,
-	"idp:8443":       false,
-	"sp:443":         false,
-	"activemq:5672":  false,
-	"activemq:61613": false,
-	"activemq:61616": false,
+	"ldap:389":          false,
+	"idp:8443":          false,
+	"sp:443":            false,
+	"activemq:5672":     false,
+	"activemq:61613":    false,
+	"activemq:61616":    false,
+	"proxy:80":          false,
+	"proxy:443":         false,
+	"archive.local:443": false,
 }
 
 func TestMain(m *testing.M) {
