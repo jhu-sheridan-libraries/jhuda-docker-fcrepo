@@ -16,7 +16,7 @@ import (
 
 var fcrepoEnv = env.New()
 
-var deps = map[string]bool{
+var service_deps = map[string]bool{
 	"ldap:389":       false,
 	"idp:8443":       false,
 	"sp:443":         false,
@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 			rc = res.StatusCode
 			defer func() { _ = res.Body.Close() }()
 		}
-		//fmt.Printf("%v Waiting for %v ...\n", time.Now(), fcrepoEnv.BaseUri)
+		fmt.Printf("%v Waiting for %v ...\n", time.Now(), fcrepoEnv.BaseUri)
 		time.Sleep(5 * time.Second)
 		elapsed = time.Now().Sub(start)
 	}
@@ -46,17 +46,17 @@ func TestMain(m *testing.M) {
 		os.Exit(rc)
 	}
 
-	//fmt.Printf("Fedora started successfully: %v (elapsed: %v)\n", rc, elapsed)
+	fmt.Printf("Fedora started successfully: %v (elapsed: %v)\n", rc, elapsed)
 
 	// Verify tcp connectivity to dependencies
-	for k := range deps {
+	for k := range service_deps {
 		start = time.Now()
 		for !timedout(start, timeout) {
-			//fmt.Printf("Dialing %v\n", k)
+			fmt.Printf("Dialing %v\n", k)
 			if c, err := net.Dial("tcp", k); err == nil {
 				_ = c.Close()
-				deps[k] = true
-				//fmt.Printf("Successfully connected to %v\n", k)
+				service_deps[k] = true
+				fmt.Printf("Successfully connected to %v\n", k)
 				break
 			} else {
 				time.Sleep(5 * time.Second)
@@ -64,7 +64,7 @@ func TestMain(m *testing.M) {
 		}
 	}
 
-	for k, v := range deps {
+	for k, v := range service_deps {
 		if !v {
 			fmt.Printf("failed to connect to %v", k)
 			os.Exit(1)
