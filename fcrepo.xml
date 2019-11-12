@@ -71,14 +71,14 @@
             <New class="org.eclipse.jetty.security.DefaultIdentityService"/>
         </Set>
 
-        <Set name="realmName"><Property name="jhuda.fcrepo.authrealm" default="fcrepo"/></Set>
+        <Set name="realmName"><SystemProperty name="jhuda.fcrepo.authrealm" default="fcrepo"/></Set>
 
         <!-- Login service for basic auth, used when incoming requests do not have a Principal.  The service is named
              after the authentication realm so that Jetty can look it up by the realm name.  That said, by setting the
              service here, the lookup is avoided.  The <login-config> is kept in web.xml, but isn't used by Jetty.  -->
         <Set name="loginService">
             <New class="org.eclipse.jetty.security.HashLoginService" id="hashLoginService">
-                <Set name="name"><Property name="jhuda.fcrepo.authrealm" default="fcrepo"/></Set>
+                <Set name="name"><SystemProperty name="jhuda.fcrepo.authrealm" default="fcrepo"/></Set>
                 <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/fcrepo-realm.properties</Set>
                 <Set name="identityService">
                     <Ref refid="fcrepoIdService"/>
@@ -92,8 +92,8 @@
         <Set name="authenticator">
             <New class="edu.jhu.library.jetty.security.ShibbolethHeaderAuthenticator" id="shibAuthenticator">
                 <Set name="configuration"><Ref refid="fcrepoSecurityHandler"/></Set>
-                <Set name="headerName"><Property name="jhuda.fcrepo.authheader" default="On-Behalf-Of"/></Set>
-                <Set name="defaultRoles"><Property name="jhuda.fcrepo.roles" default="fedoraUser"/></Set>
+                <Set name="headerName"><SystemProperty name="jhuda.fcrepo.authheader" default="On-Behalf-Of"/></Set>
+                <Set name="defaultRoles"><SystemProperty name="jhuda.fcrepo.roles" default="fedoraUser"/></Set>
                 <Set name="fallbackAuthenticator">
                     <New class="org.eclipse.jetty.security.authentication.BasicAuthenticator">
                         <Set name="configuration">

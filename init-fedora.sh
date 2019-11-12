@@ -14,6 +14,7 @@ fi
 
 echo "Starting Fedora..."
 java -jar start.jar \
+  --exec \
   -Djetty.http.port=${FCREPO_JETTY_PORT} \
   -Dfcrepo.modeshape.configuration=${FCREPO_MODESHAPE_CONFIG} \
   -Dfcrepo.home=${FCREPO_DATA_DIR}  \
