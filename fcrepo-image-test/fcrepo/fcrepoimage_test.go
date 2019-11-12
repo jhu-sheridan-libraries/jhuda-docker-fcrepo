@@ -1,3 +1,4 @@
+// Package main tests the jetty-shib-authenticator and the configuration in fcrepo.xml.
 package main
 
 import (
@@ -16,7 +17,7 @@ import (
 
 var fcrepoEnv = env.New()
 
-var service_deps = map[string]bool{
+var serviceDeps = map[string]bool{
 	"ldap:389":          false,
 	"idp:8443":          false,
 	"sp:443":            false,
@@ -52,13 +53,13 @@ func TestMain(m *testing.M) {
 	fmt.Printf("Fedora started successfully: %v (elapsed: %v)\n", rc, elapsed)
 
 	// Verify tcp connectivity to dependencies
-	for k := range service_deps {
+	for k := range serviceDeps {
 		start = time.Now()
 		for !timedout(start, timeout) {
 			fmt.Printf("Dialing %v\n", k)
 			if c, err := net.Dial("tcp", k); err == nil {
 				_ = c.Close()
-				service_deps[k] = true
+				serviceDeps[k] = true
 				fmt.Printf("Successfully connected to %v\n", k)
 				break
 			} else {
@@ -67,7 +68,7 @@ func TestMain(m *testing.M) {
 		}
 	}
 
-	for k, v := range service_deps {
+	for k, v := range serviceDeps {
 		if !v {
 			fmt.Printf("failed to connect to %v", k)
 			os.Exit(1)
