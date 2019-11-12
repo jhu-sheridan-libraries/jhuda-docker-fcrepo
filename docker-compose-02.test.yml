@@ -21,6 +21,7 @@ services:
       - ldap
       - sp
       - idp
+      - proxy
 
   fcrepo:
     image: jhuda/fcrepo:latest
