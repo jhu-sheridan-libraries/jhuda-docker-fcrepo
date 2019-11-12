@@ -11,6 +11,7 @@ services:
       - CGO_ENABLED=0
       - FCREPO_BASE_URI=http://fcrepo:8080/fcrepo/rest
       - PUBLIC_BASE_URI=https://archive.local/fcrepo/rest
+      - SP_PROXY_URI=http://sp/fcrepo/rest
     volumes:
       - "./fcrepo-image-test:/go/src"
     networks:

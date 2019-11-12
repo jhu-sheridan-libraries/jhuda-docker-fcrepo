@@ -86,7 +86,8 @@ func timedout(start time.Time, timeout time.Duration) bool {
 // insures the rest API requires authentication by default
 func Test_BasicAuthChallenge(t *testing.T) {
 	res, err := http.Get(fcrepoEnv.BaseUri)
-	assert.Nil(t, err)
+	assert.Nilf(t, err,
+		"Expected to be challenged for authorization to %v, but received error %v", fcrepoEnv.BaseUri, err)
 	defer func() { _ = res.Body.Close() }()
 
 	assert.Equal(t, 401, res.StatusCode)
@@ -126,4 +127,65 @@ func Test_SpAuthChallenge(t *testing.T) {
 	doc := gsoup.HTMLParse(string(b))
 	title := doc.Find("title").Text()
 	assert.Equal(t, "Web Login Service", title)
+}
+
+// Spoofing the value of the FCREPO_SP_AUTH_HEADER env var in a request to the proxy should fail
+func Test_SpoofHeaderProxy(t *testing.T) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	req, _ := http.NewRequest("GET", fcrepoEnv.PublicBaseUri, nil)
+	req.Header.Add(fcrepoEnv.SpAuthHeader, "moo")
+
+	res, err := client.Do(req)
+	assert.Nilf(t, err, "Error: %v", err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.EqualValues(t, 500, res.StatusCode)
+	b, err := ioutil.ReadAll(res.Body)
+
+	doc := gsoup.HTMLParse(string(b))
+	title := doc.Find("title").Text()
+	assert.Equal(t, "opensaml::SecurityPolicyException", title)
+}
+
+// Spoofing the value of the FCREPO_SP_AUTH_HEADER env var in a request to the sp should fail
+func Test_SpoofHeaderSp(t *testing.T) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	req, _ := http.NewRequest("GET", fcrepoEnv.SpProxyUri, nil)
+	req.Header.Add(fcrepoEnv.SpAuthHeader, "moo")
+
+	res, err := client.Do(req)
+	assert.Nilf(t, err, "Error: %v", err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.EqualValues(t, 500, res.StatusCode)
+	b, err := ioutil.ReadAll(res.Body)
+
+	doc := gsoup.HTMLParse(string(b))
+	title := doc.Find("title").Text()
+	assert.Equal(t, "opensaml::SecurityPolicyException", title)
+}
+
+// Spoofing the value of the FCREPO_SP_AUTH_HEADER env var in a request to the proxy should succeed
+func Test_SpoofHeaderFcrepo(t *testing.T) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	req, _ := http.NewRequest("GET", fcrepoEnv.BaseUri, nil)
+	req.Header.Add(fcrepoEnv.SpAuthHeader, fcrepoEnv.User)
+
+	res, err := client.Do(req)
+	assert.Nilf(t, err, "Error: %v", err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.EqualValues(t, 200, res.StatusCode)
 }
