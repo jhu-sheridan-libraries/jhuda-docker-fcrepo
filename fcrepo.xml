@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 Johns Hopkins University
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *     http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_4.dtd">
+
+<!--
+  Configures the Fedora web application context; similar to a Tomcat context.xml.
+
+  This file configures the Fedora web application context with two mechanisms for authenticating users by Jetty,
+  applied in order:
+  1.  the ShibbolethHeaderAuthenticator which attempts to extract a Principal from an incoming request
+  2.  the BasicAuthenticator, which challenges the user for authentication using Basic Auth.
+
+  If the ShibbolethHeaderAuthenticator cannot extract a Principal from an incoming request, it will fall back to using
+  the BasicAuthenticator.  End users will never be challenged by the BasicAuthenticator assuming proper configuration of
+   the proxies and Shibboleth Service Provider.
+
+  The roles for the authenticated user are determined differently depending on which authenticator is used.  The
+  ShibbolethHeaderAuthenticator uses values specified by the `jhuda.fcrepo.roles` system property.  Every request
+  authenticated by the ShibbolethHeaderAuthenticator will have the same roles.  The BasicAuthenticator is configured by
+  `fcrepo-realm.properties`, which enumerates each user, their password, and their roles.
+
+  Backend processes and services that access Fedora will need to have authentication credentials specified in
+  `fcrepo-realm.properties`.  End users must authenticate using Shibboleth, enforced by the Service Provider; they will
+  never be challenged for Basic Auth (as long as the SSL-terminating proxy and the Service Provider proxy are properly
+  configured).
+
+  See https://www.eclipse.org/jetty/documentation/current/configuring-security.html for an introduction to Jetty
+  security, including the Authenticator interface used below.
+
+  See https://www.eclipse.org/jetty/documentation/current/reference-section.html#jetty-xml-syntax documenting the Jetty
+  IoC DSL used below.
+
+  See Javadoc for some of the core Jetty classes below:
+  - https://www.eclipse.org/jetty/javadoc/9.4.20.v20190813/org/eclipse/jetty/security/LoginService.html
+  - https://www.eclipse.org/jetty/javadoc/9.4.20.v20190813/org/eclipse/jetty/security/authentication/LoginAuthenticator.html
+  - https://www.eclipse.org/jetty/javadoc/9.4.20.v20190813/org/eclipse/jetty/security/authentication/BasicAuthenticator.html
+  - https://www.eclipse.org/jetty/javadoc/9.4.20.v20190813/org/eclipse/jetty/security/IdentityService.html
+  - https://www.eclipse.org/jetty/javadoc/9.4.20.v20190813/org/eclipse/jetty/security/DefaultIdentityService.html
+
+  Properties may be set at runtime rather than editing this file:
+
+  - jhuda.fcrepo.authrealm: the name of the Basic Authentication realm that the Fedora repository belongs to (this is in
+    lieu of a <login-config> being specified in the web.xml)
+  - jhuda.fcrepo.authheader (default value: 'On-Behalf-Of'): the name of the HTTP header that carries the authenticated
+    user name
+  - jhuda.fcrepo.roles (default value: 'fedoraUser'): a comma-separated string that contains the roles the authenticated
+    user belongs to
+-->
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+    <Set name="contextPath">/fcrepo</Set>
+    <Set name="war"><SystemProperty name="jetty.home" default="."/>/webapps/fcrepo</Set>
+    <Get name="securityHandler" id="fcrepoSecurityHandler">
+        <Set name="identityService" id="fcrepoIdService">
+            <New class="org.eclipse.jetty.security.DefaultIdentityService"/>
+        </Set>
+
+        <Set name="realmName"><SystemProperty name="jhuda.fcrepo.authrealm" default="fcrepo"/></Set>
+
+        <!-- Login service for basic auth, used when incoming requests do not have a Principal.  The service is named
+             after the authentication realm so that Jetty can look it up by the realm name.  That said, by setting the
+             service here, the lookup is avoided.  The <login-config> is kept in web.xml, but isn't used by Jetty.  -->
+        <Set name="loginService">
+            <New class="org.eclipse.jetty.security.HashLoginService" id="hashLoginService">
+                <Set name="name"><SystemProperty name="jhuda.fcrepo.authrealm" default="fcrepo"/></Set>
+                <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/fcrepo-realm.properties</Set>
+                <Set name="identityService">
+                    <Ref refid="fcrepoIdService"/>
+                </Set>
+            </New>
+        </Set>
+
+        <!-- The ShibbolethHeaderAuthenticator attempts to extract the Principal from the HTTP header named in the
+        system property 'jhuda.fcrepo.authheader'.  If no Principal is found, the BasicAuthenticator is used to
+        challenge the user to authenticate. -->
+        <Set name="authenticator">
+            <New class="edu.jhu.library.jetty.security.ShibbolethHeaderAuthenticator" id="shibAuthenticator">
+                <Set name="configuration"><Ref refid="fcrepoSecurityHandler"/></Set>
+                <Set name="headerName"><SystemProperty name="jhuda.fcrepo.authheader" default="On-Behalf-Of"/></Set>
+                <Set name="defaultRoles"><SystemProperty name="jhuda.fcrepo.roles" default="fedoraUser"/></Set>
+                <Set name="fallbackAuthenticator">
+                    <New class="org.eclipse.jetty.security.authentication.BasicAuthenticator">
+                        <Set name="configuration">
+                            <Ref refid="fcrepoSecurityHandler"/>
+                        </Set>
+                    </New>
+                </Set>
+            </New>
+        </Set>
+    </Get>
+</Configure>

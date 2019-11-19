@@ -10,12 +10,14 @@ apk -q --no-progress add curl
 
 fedora_up 30
 
+RESULT=$?
+
 echo "** run_tests.err **"
 cat /tmp/run_tests.err
 echo "** run_tests.out **"
 cat /tmp/run_tests.out
 
-test_and_exit $? "Jetty failed to start (see above log output)"
+test_and_exit ${RESULT} "Jetty failed to start (see above log output)"
 
 ls -l /data/README.md
 
