@@ -25,7 +25,6 @@ services:
       - proxy
 
   fcrepo:
-    image: jhuda/fcrepo:latest
     build:
       context: .
     container_name: fcrepo
